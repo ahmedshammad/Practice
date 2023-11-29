@@ -1,0 +1,78 @@
+#DBSCAN Example:
+
+from sklearn.cluster import DBSCAN
+from sklearn.metrics import silhouette_score
+
+# Sample data (replace this with your actual data)
+data = ...
+
+# Define a range of values for eps and min_samples
+eps_values = [0.5, 1.0, 1.5]
+min_samples_values = [5, 10, 15]
+
+best_score = -1
+best_params = {}
+
+# Perform grid search
+for eps in eps_values:
+    for min_samples in min_samples_values:
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+        labels = dbscan.fit_predict(data)
+        silhouette_avg = silhouette_score(data, labels)
+        
+        # Update best hyperparameters if silhouette score improves
+        if silhouette_avg > best_score:
+            best_score = silhouette_avg
+            best_params = {'eps': eps, 'min_samples': min_samples}
+
+# Print the best hyperparameters
+print("Best Hyperparameters for DBSCAN:", best_params)
+
+import matplotlib.pyplot as plt
+
+# Use the best hyperparameters for clustering
+best_dbscan = DBSCAN(eps=best_params['eps'], min_samples=best_params['min_samples'])
+best_labels = best_dbscan.fit_predict(data)
+
+# Visualize the clusters (customize this based on your data)
+plt.scatter(data[:, 0], data[:, 1], c=best_labels, cmap='viridis')
+plt.title('DBSCAN Clusters')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.show()
+silhouette_avg = silhouette_score(data, best_labels)
+print("Silhouette Score for DBSCAN:", silhouette_avg)
+
+
+
+
+
+#Agglomerative Clustering Example:
+from sklearn.cluster import AgglomerativeClustering
+
+# Sample data (replace this with your actual data)
+data = ...
+
+# Define a range of values for n_clusters, affinity, and linkage
+n_clusters_values = [2, 3, 4]
+affinity_values = ['euclidean', 'manhattan']
+linkage_values = ['ward', 'complete', 'average']
+
+best_score = -1
+best_params = {}
+
+# Perform grid search
+for n_clusters in n_clusters_values:
+    for affinity in affinity_values:
+        for linkage in linkage_values:
+            agglomerative = AgglomerativeClustering(n_clusters=n_clusters, affinity=affinity, linkage=linkage)
+            labels = agglomerative.fit_predict(data)
+            silhouette_avg = silhouette_score(data, labels)
+            
+            # Update best hyperparameters if silhouette score improves
+            if silhouette_avg > best_score:
+                best_score = silhouette_avg
+                best_params = {'n_clusters': n_clusters, 'affinity': affinity, 'linkage': linkage}
+
+# Print the best hyperparameters
+print("Best Hyperparameters for Agglomerative Clustering:", best_params)
