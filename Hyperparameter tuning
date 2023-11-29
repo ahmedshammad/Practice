@@ -47,16 +47,17 @@ print("Silhouette Score for DBSCAN:", silhouette_avg)
 
 
 
+
 #Agglomerative Clustering Example:
 from sklearn.cluster import AgglomerativeClustering
 
 # Sample data (replace this with your actual data)
-data = ...
+data = X
 
 # Define a range of values for n_clusters, affinity, and linkage
 n_clusters_values = [2, 3, 4]
 affinity_values = ['euclidean', 'manhattan']
-linkage_values = ['ward', 'complete', 'average']
+linkage_values = [ 'complete', 'average']
 
 best_score = -1
 best_params = {}
