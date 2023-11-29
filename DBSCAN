@@ -1,0 +1,46 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from pylab import rcParams
+import seaborn as sb
+import sklearn
+from sklearn.cluster import DBSCAN
+from collections import Counter
+%matplotlib inline
+rcParams['figure.figsize'] = 5, 4
+sb.set_style('whitegrid')
+
+# Load the Iris dataset into a pandas DataFrame
+address = 'iris.data.csv'
+df = pd.read_csv(address, header=None, sep=',')
+df.columns=['Sepal Length','Sepal Width','Petal Length','Petal Width', 'Species']
+
+# Extract the feature columns (Sepal Length, Sepal Width, Petal Length, Petal Width) and target column (Species)
+data = df.iloc[:,0:4].values
+target = df.iloc[:,4].values
+
+# Display the first 5 rows of the DataFrame
+df[:5]
+
+# Create a DBSCAN (Density-Based Spatial Clustering of Applications with Noise) model
+model = DBSCAN(eps=0.8,  min_samples=19).fit(data)
+print(model)  # Display information about the DBSCAN model
+
+# Count the number of occurrences of each cluster label
+print(Counter(model.labels_))
+
+# Display rows of the original data DataFrame for data points labeled as outliers (-1 by DBSCAN)
+print(outliers_df[model.labels_ == -1])
+
+# Create a scatter plot to visualize the clusters formed by DBSCAN
+fig = plt.figure()
+ax = fig.add_axes([.1, .1, 1, 1])
+
+# Assign colors based on cluster labels
+colors = model.labels_
+
+# Scatter plot using Petal Length and Sepal Width as x and y axes
+ax.scatter(data[:, 2], data[:, 1], c=colors, s=120)
+ax.set_xlabel('Petal Length')
+ax.set_ylabel('Sepal Width')
+plt.title('DBSCAN for Outlier Detection')
+
