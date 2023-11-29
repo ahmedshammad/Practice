@@ -1,0 +1,72 @@
+# Importing necessary libraries
+
+# NumPy for numerical operations
+import numpy as np
+
+# Pandas for data manipulation and analysis
+import pandas as pd
+
+# Matplotlib for plotting
+import matplotlib.pyplot as plt
+
+# Setting figure parameters
+from pylab import rcParams
+
+# Seaborn for statistical data visualization
+import seaborn as sns
+
+# Scikit-learn for machine learning
+import sklearn
+import sklearn.metrics as sm  # Submodule for metrics in scikit-learn
+
+# AgglomerativeClustering for hierarchical clustering
+from sklearn.cluster import AgglomerativeClustering
+
+# SciPy for scientific and technical computing
+import scipy
+
+# Hierarchical clustering functionality in SciPy
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster, cophenet
+
+# Pairwise distance calculations in SciPy
+from scipy.spatial.distance import pdist
+
+# Setting printing options for NumPy
+np.set_printoptions(precision=4, suppress=True)
+
+# Creating a matplotlib figure with a specified size
+plt.figure(figsize=(10, 3))
+
+# Enabling inline plotting for Jupyter notebooks
+%matplotlib inline
+
+# Setting the plot style to 'seaborn-whitegrid'
+#plt.style.use('seaborn-whitegrid')
+cars = pd.read_csv('mtcars.csv')
+cars = cars.rename(columns={'Unnamed: 0': 'Car_names'})
+cars.head()
+X = cars[['mpg', 'disp', 'hp', 'wt']].values
+y = cars.iloc[:, 9].values
+Z = linkage(X, 'ward')
+dendrogram(Z, truncate_mode='lastp', p=22, leaf_rotation=0., leaf_font_size=15, show_contracted=True)
+plt.title('Truncated Hierarchial Clustering Diagram')
+plt.xlabel('Cluster Size')
+plt.ylabel('Distance')
+
+plt.axhline(y=500)
+plt.axhline(y=150)
+plt.show()
+k = 2
+
+Hclustering = AgglomerativeClustering(n_clusters=k, affinity='euclidean', linkage='ward')
+Hclustering.fit(X)
+
+sm.accuracy_score(y, Hclustering.labels_)
+Hclustering = AgglomerativeClustering(n_clusters=k, affinity='euclidean', linkage='average')
+Hclustering.fit(X)
+
+sm.accuracy_score(y, Hclustering.labels_)
+Hclustering = AgglomerativeClustering(n_clusters=k, affinity='manhattan', linkage='average')
+Hclustering.fit(X)
+
+sm.accuracy_score(y, Hclustering.labels_)
