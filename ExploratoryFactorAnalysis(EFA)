@@ -1,0 +1,69 @@
+
+import pandas as pd
+from sklearn.decomposition import FactorAnalysis
+import matplotlib.pyplot as plt
+
+# Create a synthetic dataset for illustration
+data = pd.DataFrame({
+    'Math': [80, 75, 90, 85],
+    'Reading': [70, 85, 95, 80],
+    'Science': [75, 80, 92, 88],
+    'Writing': [85, 78, 88, 90]
+})
+
+# Instantiate the FactorAnalysis with the number of factors (latent variables) you expect
+factor_analyzer = FactorAnalysis(n_components=4)  # You can choose the number of factors based on your understanding or analysis
+
+# Fit the model to your data
+factor_analyzer.fit(data)
+
+# Get factor loadings (how each variable contributes to each factor)
+loadings = factor_analyzer.components_.T
+
+# Visualize the factor loadings
+plt.figure(figsize=(8, 6))
+plt.imshow(loadings, cmap='viridis', interpolation='none', aspect='auto')
+plt.colorbar()
+plt.xticks(range(data.shape[1]), data.columns, rotation=45)
+plt.yticks(range(factor_analyzer.n_components), [f'Factor {i+1}' for i in range(factor_analyzer.n_components)])
+plt.title('Factor Loadings')
+plt.show()
+df = pd.DataFrame(loadings)
+df = df.transpose()
+df.columns = data.columns
+df
+
+
+
+
+
+
+# import numpy as np
+import pandas as pd
+from sklearn.decomposition import FactorAnalysis
+import matplotlib.pyplot as plt
+
+# Your matrix
+data = np.array([
+    [4.734392, 7.731993, 6.498257, 2.484411],
+    [-2.668054, 4.541001, -0.425596, -3.772600],
+    [-1.037589, -0.330415, 1.053313, 0.129637],
+    [0.000000, -0.000000, 0.000000, -0.000000]
+])
+
+# Try different numbers of latent variables
+n_latent_variables = range(1, 5)
+explained_variances = []
+
+for n in n_latent_variables:
+    factor_analyzer = FactorAnalysis(n_components=n)
+    factor_analyzer.fit(data)
+    explained_variances.append(np.sum(factor_analyzer.noise_variance_))
+
+# Plotting
+plt.plot(n_latent_variables, explained_variances, marker='o')
+plt.title('Explained Variance vs. Number of Latent Variables')
+plt.xlabel('Number of Latent Variables')
+plt.ylabel('Explained Variance')
+plt.show()
+
