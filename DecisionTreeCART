@@ -1,0 +1,171 @@
+# Importing necessary libraries
+import pandas as pd
+
+# Reading the 'income.csv' file into a DataFrame
+income = pd.read_csv("income.csv")
+
+# Displaying the first few rows of the DataFrame
+income.head()
+
+# Displaying information about the DataFrame
+income.info()
+
+# Displaying descriptive statistics of the DataFrame
+income.describe()
+
+# Importing necessary libraries for visualization
+%matplotlib inline
+from matplotlib import pyplot as plt
+import seaborn as sns
+
+# Creating a boxplot of Salary based on Education level
+ax = sns.boxplot(data=income, x='Education', y='Salary')
+
+# Creating a boxplot of Age based on Education level
+ax = sns.boxplot(data=income, x='Education', y='Age')
+
+# Creating a scatter plot of Age vs. Salary colored and styled by Education level
+ax = sns.scatterplot(data=income,
+                     x='Age',
+                     y='Salary',
+                     hue='Education',
+                     style='Education',
+                     s=150)
+
+# Adding a legend outside the plot
+ax = plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+
+# Separating the features and target variable
+y = income[['Salary']]
+X = income[['Age', 'Education']]
+
+# Splitting the data into training and testing sets
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                    train_size=0.6,
+                                                    stratify=X['Education'],
+                                                    random_state=1234)
+
+# Displaying the shapes of the training and testing sets
+X_train.shape, X_test.shape
+
+# Displaying the first few rows of the training set
+X_train.head()
+
+# One-hot encoding categorical variables in the training set
+X_train = pd.get_dummies(X_train)
+X_train.head()
+
+# One-hot encoding categorical variables in the testing set
+X_test = pd.get_dummies(X_test)
+X_test.head()
+
+# Creating a Decision Tree Regressor model
+from sklearn.tree import DecisionTreeRegressor
+regressor = DecisionTreeRegressor(random_state=1234)
+model = regressor.fit(X_train, y_train)
+
+# Evaluating the model on the testing set
+model.score(X_test, y_test)
+
+# Predicting the target variable on the testing set
+y_test_pred = model.predict(X_test)
+
+# Calculating the Mean Absolute Error
+from sklearn.metrics import mean_absolute_error
+mean_absolute_error(y_test, y_test_pred)
+
+# Visualizing the Decision Tree
+from sklearn import tree
+import matplotlib.pyplot as plt
+
+# Setting the size of the figure
+plt.figure(figsize=(15, 15))
+
+# Plotting the decision tree
+tree.plot_tree(model,
+               feature_names=list(X_train.columns),
+               filled=True)
+
+# Saving the plot as an image file
+plt.savefig('Tree.PNG')
+
+# Displaying a subset of the decision tree with a maximum depth of 1
+plt.figure(figsize=(15, 15))
+tree.plot_tree(model,
+               feature_names=list(X_train.columns),
+               filled=True,
+               max_depth=1)
+
+# Extracting feature importances from the model
+importance = model.feature_importances_
+
+# Creating a Series of feature importances with corresponding column names
+feature_importance = pd.Series(importance, index=X_train.columns)
+
+# Sorting and plotting the feature importances
+feature_importance.sort_values().plot(kind='bar')
+plt.ylabel('Importance')
+
+# Evaluating the model on the training set
+model.score(X_train, y_train)
+
+# Evaluating the model on the testing set
+model.score(X_test, y_test)
+
+# Performing cost complexity pruning and obtaining alpha values
+path = regressor.cost_complexity_pruning_path(X_train, y_train)
+ccp_alphas = path.ccp_alphas
+
+# Removing the last alpha value as it corresponds to a fully grown tree
+ccp_alphas = ccp_alphas[:-1]
+
+# Creating empty lists to store training and testing scores
+train_scores, test_scores = [], []
+
+# Looping through different alpha values and training Decision Trees
+for alpha in ccp_alphas:
+    regressor_ = DecisionTreeRegressor(random_state=1234, ccp_alpha=alpha)
+    model_ = regressor_.fit(X_train, y_train)
+    train_scores.append(model_.score(X_train, y_train))
+    test_scores.append(model_.score(X_test, y_test))
+
+# Plotting the R-squared values against alpha values
+plt.plot(ccp_alphas,
+         train_scores,
+         marker="o",
+         label='train_score',
+         drawstyle="steps-post")
+plt.plot(ccp_alphas,
+         test_scores,
+         marker="o",
+         label='test_score',
+         drawstyle="steps-post")
+plt.legend()
+plt.title('R-squared by alpha')
+
+# Displaying the R-squared values corresponding to different alpha values
+test_scores
+
+# Finding the index of the maximum test score
+ix = test_scores.index(max(test_scores))
+
+# Extracting the best alpha value
+best_alpha = ccp_alphas[ix]
+best_alpha
+
+# Creating a new Decision Tree Regressor model with the best alpha value
+regressor_ = DecisionTreeRegressor(random_state=1234, ccp_alpha=best_alpha)
+model_ = regressor_.fit(X_train, y_train)
+
+# Evaluating the new model on the training set
+model_.score(X_train, y_train)
+
+# Evaluating the new model on the testing set
+model_.score(X_test, y_test)
+
+# Plotting the pruned decision tree
+plt.figure(figsize=(15, 15))
+tree.plot_tree(model_,
+               feature_names=list(X_train.columns),
+               filled=True)
